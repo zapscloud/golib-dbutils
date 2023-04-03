@@ -15,6 +15,9 @@ const (
 )
 
 const (
+	// Database collection prefix
+	DB_COLLECTION_PREFIX = "zc_"
+
 	// Common for all DBs
 	DB_TYPE = "dbtype"
 
