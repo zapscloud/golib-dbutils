@@ -13,6 +13,18 @@ type CommonSvc interface {
 	Find(filter string) (utils.Map, error)
 }
 
+func GetUniqueKeyId(svc CommonSvc, key string, value string) string {
+	filter := fmt.Sprintf(`{"%s":"%s"}`, key, value)
+
+	_, err := svc.Find(filter)
+	if err == nil {
+		// KeyId already found, look for next one
+		return GetUniqueKeyId(svc, key, utils.GenerateNextKeyId(value))
+	}
+
+	return value
+}
+
 func IsGetValueExist(svc CommonSvc, value string, shouldExist bool) (utils.Map, error) {
 	var err error = nil
 
