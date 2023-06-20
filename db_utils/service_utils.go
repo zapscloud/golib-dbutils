@@ -29,7 +29,7 @@ func IsGetValueExist(svc CommonSvc, value string, shouldExist bool) (utils.Map, 
 	var err error = nil
 
 	resp, _ := svc.Get(value)
-	if resp == nil {
+	if len(resp) == 0 {
 		// Record not Found
 		if shouldExist {
 			err = &utils.AppError{ErrorStatus: 4023, ErrorMsg: "Get Error", ErrorDetail: "'" + value + "' is not exist"}
@@ -49,7 +49,7 @@ func IsFindValueExist(svc CommonSvc, key string, value string, shouldExist bool)
 	filter := fmt.Sprintf(`{"%s":"%s"}`, key, value)
 
 	resp, _ := svc.Find(filter)
-	if resp == nil {
+	if len(resp) == 0 {
 		// Record not Found
 		if shouldExist {
 			err = &utils.AppError{ErrorStatus: 4023, ErrorMsg: "Find Error", ErrorDetail: "'" + value + "' is not exist"}
