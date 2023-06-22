@@ -19,27 +19,27 @@ func (p *BaseMySqlService) OpenDatabaseService(props utils.Map) error {
 	var err error
 
 	log.Println("MySqlDB Connection Props ", props)
-	dbhost, err := utils.IsMemberExist(props, db_common.DB_SERVER)
+	dbhost, err := utils.GetMemberDataStr(props, db_common.DB_SERVER)
 	if err != nil {
 		return err
 	}
 
-	dbport, err := utils.IsMemberExist(props, db_common.DB_PORT)
+	dbport, err := utils.GetMemberDataStr(props, db_common.DB_PORT)
 	if err != nil {
 		return err
 	}
 
-	dbname, err := utils.IsMemberExist(props, db_common.DB_NAME)
+	dbname, err := utils.GetMemberDataStr(props, db_common.DB_NAME)
 	if err != nil {
 		return err
 	}
 
-	dbuser, err := utils.IsMemberExist(props, db_common.DB_USER)
+	dbuser, err := utils.GetMemberDataStr(props, db_common.DB_USER)
 	if err != nil {
 		return err
 	}
 
-	dbsecret, err := utils.IsMemberExist(props, db_common.DB_SECRET)
+	dbsecret, err := utils.GetMemberDataStr(props, db_common.DB_SECRET)
 	if err != nil {
 		return err
 	}

@@ -18,22 +18,22 @@ type BaseMongoService struct {
 func (p *BaseMongoService) OpenDatabaseService(props utils.Map) error {
 
 	log.Println("MongoDB Connection Props ", props)
-	dbserver, err := utils.IsMemberExist(props, db_common.DB_SERVER)
+	dbserver, err := utils.GetMemberDataStr(props, db_common.DB_SERVER)
 	if err != nil {
 		return err
 	}
 
-	dbname, err := utils.IsMemberExist(props, db_common.DB_NAME)
+	dbname, err := utils.GetMemberDataStr(props, db_common.DB_NAME)
 	if err != nil {
 		return err
 	}
 
-	dbuser, err := utils.IsMemberExist(props, db_common.DB_USER)
+	dbuser, err := utils.GetMemberDataStr(props, db_common.DB_USER)
 	if err != nil {
 		return err
 	}
 
-	dbsecret, err := utils.IsMemberExist(props, db_common.DB_SECRET)
+	dbsecret, err := utils.GetMemberDataStr(props, db_common.DB_SECRET)
 	if err != nil {
 		return err
 	}

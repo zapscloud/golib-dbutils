@@ -7,7 +7,7 @@ require (
 	github.com/jmoiron/sqlx v1.3.4
 	github.com/kr/pretty v0.3.0
 	github.com/zapscloud/golib v1.0.4
-	github.com/zapscloud/golib-utils v1.0.0
+	github.com/zapscloud/golib-utils v1.0.1-0.20230622110613-b4f6b17a0f53
 	go.mongodb.org/mongo-driver v1.9.0
 )
 

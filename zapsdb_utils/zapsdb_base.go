@@ -19,17 +19,17 @@ type BaseZapsService struct {
 func (p *BaseZapsService) OpenDatabaseService(props utils.Map) error {
 
 	log.Println("ZapsDB Connection Props ", props)
-	dbapp, err := utils.IsMemberExist(props, db_common.DB_APP)
+	dbapp, err := utils.GetMemberDataStr(props, db_common.DB_APP)
 	if err != nil {
 		return err
 	}
 
-	dbuser, err := utils.IsMemberExist(props, db_common.DB_KEY)
+	dbuser, err := utils.GetMemberDataStr(props, db_common.DB_KEY)
 	if err != nil {
 		return err
 	}
 
-	dbsecret, err := utils.IsMemberExist(props, db_common.DB_SECRET)
+	dbsecret, err := utils.GetMemberDataStr(props, db_common.DB_SECRET)
 	if err != nil {
 		return err
 	}
