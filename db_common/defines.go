@@ -19,7 +19,8 @@ const (
 	DB_COLLECTION_PREFIX = "zc_"
 
 	// Common for all DBs
-	DB_TYPE = "dbtype"
+	DB_TYPE       = "dbtype"
+	DB_OPEN_COUNT = "open_count"
 
 	// MongoDB Parameters
 	DB_SERVER = "dbserver"

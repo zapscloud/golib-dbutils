@@ -28,7 +28,16 @@ func checkDBOpened(dbServer string, dbName string) (utils.Map, error) {
 		server := utils.ToLower(db[db_common.DB_SERVER].(string))
 		name := utils.ToLower(db[db_common.DB_NAME].(string))
 		if utils.ToLower(dbServer) == server && utils.ToLower(name) == dbName {
-			log.Println("MongoDB Connection Already Opened, returning existing connection")
+			log.Println("checkDBOpened :: MongoDB Connection Already Opened, returning existing connection")
+			// Increment Instance Count
+			if dataVal, dataOk := db[db_common.DB_OPEN_COUNT]; dataOk {
+				dbInstanceCnt := dataVal.(int)
+				// Increment the Value
+				dbInstanceCnt++
+				// Assign it back
+				db[db_common.DB_OPEN_COUNT] = dbInstanceCnt
+				log.Println("checkDBOpened :: MongoDB Connection instance Count => ", dbInstanceCnt)
+			}
 			return db, nil
 		}
 	}
@@ -87,6 +96,7 @@ func openMongoDb(dbserver string, dbname string, dbuser string, dbsecret string)
 	dbmap[db_common.DB_CONNECTION] = client
 	dbmap[db_common.DB_NAME] = dbname
 	dbmap[db_common.DB_TYPE] = db_common.DATABASE_TYPE_MONGODB
+	dbmap[db_common.DB_OPEN_COUNT] = 1 // Initialize it as 1
 
 	log.Println("OpenMongoDbConnection :: End")
 
@@ -151,23 +161,35 @@ func closeMongoDb(dbmap utils.Map) error {
 
 	log.Println("CloseMongoDb :: Begin")
 
-	// client := dbmap[db_common.DB_CONNECTION].(*mongo.Client)
+	if dataVal, dataOk := dbmap[db_common.DB_OPEN_COUNT]; dataOk {
+		dbInstanceCnt := dataVal.(int)
+		// Decrement Instance Count
+		dbInstanceCnt--
+		// Assign it back to Array
+		dbmap[db_common.DB_OPEN_COUNT] = dbInstanceCnt
+		if dbInstanceCnt > 0 {
+			log.Println("CloseMongoDb :: Don't close the DB, since the DBOpenCount having valid value =>", dbInstanceCnt)
+			return nil
+		}
+	}
 
-	// if client == nil {
-	// 	log.Println("Connection to MongoDB not open.")
-	// 	log.Println("CloseMongoDb :: End")
-	// 	return nil
-	// }
-	// // Close the connection once no longer needed
-	// err := client.Disconnect(context.Background())
+	client := dbmap[db_common.DB_CONNECTION].(*mongo.Client)
 
-	// if err != nil {
-	// 	log.Println("CloseMongoDb :: Disconnect Error")
-	// 	return err
-	// 	// log.Fatal(err)
-	// } else {
-	// 	log.Println("Connection to MongoDB closed.")
-	// }
+	if client == nil {
+		log.Println("Connection to MongoDB not open.")
+		log.Println("CloseMongoDb :: End")
+		return nil
+	}
+	// Close the connection once no longer needed
+	err := client.Disconnect(context.Background())
+
+	if err != nil {
+		log.Println("CloseMongoDb :: Disconnect Error")
+		return err
+		// log.Fatal(err)
+	} else {
+		log.Println("Connection to MongoDB closed.")
+	}
 
 	log.Println("CloseMongoDb :: End")
 	return nil
