@@ -16,7 +16,7 @@ import (
 )
 
 // Global variable for MongoDB Connections
-var mongoDBConnections []utils.Map
+var g_MongoDBConnections []utils.Map
 
 func init() {
 	log.SetFlags(log.Lshortfile | log.LstdFlags | log.Lmicroseconds)
@@ -24,24 +24,20 @@ func init() {
 
 func checkDBOpened(dbServer string, dbName string) (utils.Map, error) {
 
-	for _, db := range mongoDBConnections {
-		server := utils.ToLower(db[db_common.DB_SERVER].(string))
-		name := utils.ToLower(db[db_common.DB_NAME].(string))
-		if utils.ToLower(dbServer) == server && utils.ToLower(name) == dbName {
-			log.Println("checkDBOpened :: MongoDB Connection Already Opened, returning existing connection")
-			// Increment Instance Count
-			if dataVal, dataOk := db[db_common.DB_OPEN_COUNT]; dataOk {
-				dbInstanceCnt := dataVal.(int)
-				// Increment the Value
-				dbInstanceCnt++
-				// Assign it back
-				db[db_common.DB_OPEN_COUNT] = dbInstanceCnt
-				log.Println("checkDBOpened :: MongoDB Connection instance Count => ", dbInstanceCnt)
-			}
-			return db, nil
+	db, _ := findServerFromArray(dbServer, dbName)
+	if db != nil {
+		log.Println("checkDBOpened :: MongoDB Connection Already Opened, returning existing connection")
+		// Increment Instance Count
+		dbInstanceCnt, err := utils.GetMemberDataInt(db, db_common.DB_OPEN_COUNT)
+		if err == nil {
+			// Increment the Value
+			dbInstanceCnt++
+			// Assign it back
+			db[db_common.DB_OPEN_COUNT] = dbInstanceCnt
+			log.Println("checkDBOpened :: MongoDB Connection instance Count => ", dbInstanceCnt)
 		}
+		return db, nil
 	}
-
 	return nil, &utils.AppError{ErrorCode: "S020102", ErrorMsg: "Database Connection not Found", ErrorDetail: "Database connection not opened already"}
 }
 
@@ -53,7 +49,7 @@ func openMongoDbConnection(dbserver string, dbname string, dbuser string, dbsecr
 		log.Println("No MongoDB Connection available, New Connection opening")
 		dbMap, err = openMongoDb(dbserver, dbname, dbuser, dbsecret)
 		if err == nil {
-			mongoDBConnections = append(mongoDBConnections, dbMap)
+			g_MongoDBConnections = append(g_MongoDBConnections, dbMap)
 		}
 	}
 	return dbMap, err
@@ -170,6 +166,12 @@ func closeMongoDb(dbmap utils.Map) error {
 		if dbInstanceCnt > 0 {
 			log.Println("CloseMongoDb :: Don't close the DB, since the DBOpenCount having valid value =>", dbInstanceCnt)
 			return nil
+		} else {
+			// **********************************************
+			// ** KEEP THE DATABASE CONNECTION OPEN ALWAYS **
+			// **********************************************
+			log.Println("CloseMongoDb :: Don't close the DB, ***NEED TO KEEP OPEN THE CONNECTION ALWAYS*** =>", dbInstanceCnt)
+			return nil
 		}
 	}
 
@@ -182,17 +184,48 @@ func closeMongoDb(dbmap utils.Map) error {
 	}
 	// Close the connection once no longer needed
 	err := client.Disconnect(context.Background())
-
 	if err != nil {
 		log.Println("CloseMongoDb :: Disconnect Error")
 		return err
-		// log.Fatal(err)
 	} else {
 		log.Println("Connection to MongoDB closed.")
 	}
 
+	// Remove it from the global array
+	removeDBMapFromArray(dbmap)
+
 	log.Println("CloseMongoDb :: End")
 	return nil
+}
+
+func removeDBMapFromArray(dbmap utils.Map) {
+	dbServer, _ := utils.GetMemberDataStr(dbmap, db_common.DB_SERVER)
+	dbName, _ := utils.GetMemberDataStr(dbmap, db_common.DB_NAME)
+	_, idx := findServerFromArray(dbServer, dbName)
+	log.Println("Index Values => ", g_MongoDBConnections, dbmap, idx)
+	if idx >= 0 {
+		g_MongoDBConnections = append(g_MongoDBConnections[:idx], g_MongoDBConnections[idx+1:]...)
+	}
+	log.Println("After Delete", g_MongoDBConnections)
+}
+
+func findServerFromArray(dbServer string, dbName string) (utils.Map, int) {
+	for i, db := range g_MongoDBConnections {
+		server, err := utils.GetMemberDataStr(db, db_common.DB_SERVER)
+		if err == nil {
+			server = utils.ToLower(server)
+		}
+		name, err := utils.GetMemberDataStr(db, db_common.DB_NAME)
+		if err == nil {
+			name = utils.ToLower(name)
+		}
+
+		// Compare both Server and Name values
+		if utils.ToLower(dbServer) == server && utils.ToLower(name) == dbName {
+			return db, i
+		}
+	}
+	return nil, -1
 }
 
 func txnBegin(dbmap utils.Map) utils.Map {
