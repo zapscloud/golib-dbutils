@@ -38,9 +38,8 @@ func TestMongoDB() {
 
 	log.Println("Get:: Got filter ", filter)
 
-	for i := 0; i < 500; i++ {
+	for i := 0; i < 10; i++ {
 		srv.OpenDatabaseService(GetReadDBCreds())
-		defer srv.CloseDatabaseService()
 
 		collection, ctx, err := mongo_utils.GetMongoDbCollection(srv.GetClient(), "zc_hr_staffs")
 		if err != nil {
@@ -59,6 +58,8 @@ func TestMongoDB() {
 			return
 		}
 		log.Println("Found Record: ", result)
+
+		srv.CloseDatabaseService()
 
 	}
 

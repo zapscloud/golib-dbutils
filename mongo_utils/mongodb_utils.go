@@ -28,7 +28,7 @@ func checkDBOpened(dbServer string, dbName string) (utils.Map, error) {
 	if db != nil {
 		log.Println("checkDBOpened :: MongoDB Connection Already Opened, returning existing connection")
 		// Increment Instance Count
-		dbInstanceCnt, err := utils.GetMemberDataInt(db, db_common.DB_OPEN_COUNT)
+		dbInstanceCnt, err := utils.GetMemberDataInt(db, db_common.DB_OPEN_COUNT, false)
 		if err == nil {
 			// Increment the Value
 			dbInstanceCnt++
