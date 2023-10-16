@@ -47,12 +47,6 @@ const (
 	MONGODB_CONDITION_GT  = "$gt"
 )
 
-// Default values
-const (
-	DEF_REGION_ID   = "global"
-	DEF_REGION_NAME = "Global database for all business"
-)
-
 const (
 	LIST_SUMMARY      = "summary"
 	LIST_TOTALSIZE    = "totalsize"
