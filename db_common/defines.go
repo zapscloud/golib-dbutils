@@ -41,10 +41,32 @@ const (
 
 // MongoDB Query string const
 const (
-	MONGODB_SET           = "$set"
 	MONGODB_CONDITION_AND = "$and"
 	MONGODB_CONDITION_OR  = "$or"
 	MONGODB_CONDITION_GT  = "$gt"
+
+	MONGODB_SET     = "$set"
+	MONGODB_UNSET   = "$unset"
+	MONGODB_ROOT    = "$$ROOT"
+	MONGODB_MATCH   = "$match"
+	MONGODB_LOOKUP  = "$lookup"
+	MONGODB_GROUP   = "$group"
+	MONGODB_PROJECT = "$project"
+	MONGODB_SORT    = "$sort"
+	MONGODB_SKIP    = "$skip"
+	MONGODB_LIMIT   = "$limit"
+	MONGODB_PUSH    = "$push"
+	MONGODB_SUM     = "$sum"
+	MONGODB_COUNT   = "$count"
+
+	MONGODB_DATETOSTRING = "$dateToString"
+
+	MONGODB_STR_FROM         = "from"
+	MONGODB_STR_LOCALFIELD   = "localField"
+	MONGODB_STR_FOREIGNFIELD = "foreignField"
+	MONGODB_STR_AS           = "as"
+	MONGODB_STR_PIPELINE     = "pipeline"
+	MONGODB_STR_FORMAT       = "format"
 )
 
 const (
