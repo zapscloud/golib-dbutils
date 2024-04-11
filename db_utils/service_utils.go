@@ -63,6 +63,24 @@ func IsFindValueExist(svc CommonSvc, key string, value string, shouldExist bool)
 	return resp, err
 }
 
+func IsFindFilterExist(svc CommonSvc, filter string, shouldExist bool) (utils.Map, error) {
+	var err error = nil
+
+	resp, _ := svc.Find(filter)
+	if len(resp) == 0 {
+		// Record not Found
+		if shouldExist {
+			err = &utils.AppError{ErrorStatus: 4023, ErrorMsg: "Find Error", ErrorDetail: "'" + filter + "' is not exist"}
+		}
+	} else {
+		// Record Found
+		if !shouldExist {
+			err = &utils.AppError{ErrorStatus: 4023, ErrorMsg: "Find Error", ErrorDetail: "'" + filter + "' is already exist"}
+		}
+	}
+	return resp, err
+}
+
 // Get or Find Record depends on the QueryId
 func GetRecord(svc CommonSvc, queryId string, keyId string) (utils.Map, error) {
 	var data utils.Map
